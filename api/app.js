@@ -1,6 +1,11 @@
 //import
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+
+//body parser middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 //CORS MIDDLEWARE
 app.use((req, res, next) => {
@@ -13,7 +18,15 @@ app.use((req, res, next) => {
 	next();
 })
 
-app.use('/api/posts', (req, res, next) => {
+//post route
+app.post('/api/posts', (req, res, next) => {
+	//retrieve req body
+	const posts = req.body;
+	console.log(posts);
+	res.status(201).json({ message: 'Post created successfully' });
+});
+
+app.get('/api/posts', (req, res, next) => {
 	//dummy data
 	const posts = [
 		{
