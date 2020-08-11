@@ -2,6 +2,17 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose'); //for connecting
+
+//models
+const Post = require('./models/post'); //post model
+
+//connection
+mongoose.connect('mongodb+srv://admin-bryan:bryanpass@cluster0-mnqtb.mongodb.net/Social-Network?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+	console.log('Connected to DB')
+}).catch(() => {
+	console.log('Connection to DB failed')
+})
 
 //body parser middleware
 app.use(bodyParser.json());
@@ -20,9 +31,14 @@ app.use((req, res, next) => {
 
 //post route
 app.post('/api/posts', (req, res, next) => {
-	//retrieve req body
-	const posts = req.body;
-	console.log(posts);
+	//retrieve req body and save it on instance of POST MODEL
+	const post = new Post({
+		title: req.body.title,
+		content: req.body.content
+	});
+	//save to database
+	post.save();
+	//send response
 	res.status(201).json({ message: 'Post created successfully' });
 });
 
