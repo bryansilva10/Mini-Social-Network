@@ -37,9 +37,15 @@ app.post('/api/posts', (req, res, next) => {
 		content: req.body.content
 	});
 	//save to database
-	post.save();
-	//send response
-	res.status(201).json({ message: 'Post created successfully' });
+	post.save().then(createdPost => {
+		//send response
+		res.status(201).json({
+			message: 'Post created successfully',
+			//send id in response to be able to add post correctly on the client
+			postId: createdPost._id
+		});
+	});
+
 });
 
 //route to get posts
