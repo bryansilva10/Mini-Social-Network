@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 export class PostService {
 	//prop
 	private posts: Post[] = [];
-	//subject for update
+	//subject for emitting update
 	private postsUpdated = new Subject<Post[]>();
 
 	//constructor, inject http client
@@ -57,6 +57,20 @@ export class PostService {
 				this.posts.push(post)
 				//emit an update 
 				this.postsUpdated.next([...this.posts])
+			})
+	}
+
+	//method to delete post
+	deletePost(postId: string) {
+		//http request
+		this.http.delete('http://localhost:3000/api/posts/' + postId)
+			.subscribe(() => {
+				//create updated post list by filtering out the ones that don't exist
+				const updatedPosts = this.posts.filter(post => post.id !== postId);
+				//set updated post to be the actual list of posts
+				this.posts = updatedPosts;
+				//emit changes sending copy of list
+				this.postsUpdated.next([...this.posts]);
 			})
 	}
 }

@@ -34,6 +34,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 
 	}
 
+	//at time of initializing component
 	ngOnInit() {
 		//user service to retrieve posts
 		this.postService.getPosts();
@@ -44,6 +45,13 @@ export class PostListComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	//method to do something on delete event
+	onDelete(postId: string) {
+		//user service to delete
+		this.postService.deletePost(postId);
+	}
+
+	//when component is destroyed
 	ngOnDestroy() {
 		//remove subscription and prevent memory leaks when DOM is destroyed
 		this.postsSub.unsubscribe();
