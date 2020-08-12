@@ -43,24 +43,14 @@ app.post('/api/posts', (req, res, next) => {
 });
 
 app.get('/api/posts', (req, res, next) => {
-	//dummy data
-	const posts = [
-		{
-			id: '1',
-			title: 'Server Side Post',
-			content: 'Coming from the server'
-		},
-		{
-			id: '2',
-			title: 'Another Server Side Post',
-			content: 'Another post coming from the server'
-		}
-	];
-	//send response with status 200 and json data
-	res.status(200).json({
-		message: 'Post fetched correctly',
-		posts: posts
-	})
+	//use post model to retrieve data
+	Post.find().then(documents => {
+		//send response with status 200 and json data after db query is done
+		res.status(200).json({
+			message: 'Post fetched correctly',
+			posts: documents
+		})
+	});
 })
 
 module.exports = app;

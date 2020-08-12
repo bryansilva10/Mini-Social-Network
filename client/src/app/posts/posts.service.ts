@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Post } from './post.model';
 import { Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -18,10 +19,21 @@ export class PostService {
 	//method to retrieve post
 	getPosts() {
 		//use http client
-		this.http.get<{ message: string, posts: Post[] }>('http://localhost:3000/api/posts')
-			.subscribe((postData) => {
+		this.http.get<{ message: string, posts: any }>('http://localhost:3000/api/posts')
+			//use rxjs map to transform data coming in observable stream
+			.pipe(map((postData) => {
+				//use normal map to make every post an object with correct data(including _id)
+				return postData.posts.map(post => {
+					return {
+						title: post.title,
+						content: post.content,
+						id: post._id
+					}
+				})
+			}))
+			.subscribe((transformedPosts) => {
 				//set post prop to post receiving from request
-				this.posts = postData.posts;
+				this.posts = transformedPosts;
 				//emit update
 				this.postsUpdated.next([...this.posts]);
 			})
