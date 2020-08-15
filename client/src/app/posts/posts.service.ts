@@ -3,6 +3,7 @@ import { Post } from './post.model';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,8 +14,8 @@ export class PostService {
 	//subject for emitting update
 	private postsUpdated = new Subject<Post[]>();
 
-	//constructor, inject http client
-	constructor(private http: HttpClient) { }
+	//constructor, inject http client, inject router
+	constructor(private http: HttpClient, private router: Router) { }
 
 	//method to retrieve post
 	getPosts() {
@@ -39,8 +40,15 @@ export class PostService {
 			})
 	}
 
+	//get a single post
+	getPost(id: string) {
+		//return request
+		return this.http.get<{ _id: string, title: string, content: string }>('http://localhost:3000/api/posts' + id);
+	}
+
 	//method to return update as observable
 	getPostUpdateListener() {
+
 		return this.postsUpdated.asObservable();
 	}
 
@@ -60,6 +68,35 @@ export class PostService {
 				this.posts.push(post);
 				//emit an update 
 				this.postsUpdated.next([...this.posts]);
+				//redirect to root
+				this.router.navigate(['/']);
+			})
+	}
+
+	//method to update a post
+	updatePost(id: string, title: string, content: string) {
+		//create instance of post
+		const post: Post = {
+			id: id,
+			title: title,
+			content: content
+		}
+
+		//request put and send post to update
+		this.http.put('http://localhost:3000/api/posts/' + id, post)
+			.subscribe(response => {
+				//make copy of posts
+				const updatedPosts = [...this.posts];
+				//get index of post that was updated
+				const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+				//acess that index and set that post to be the new istance of post
+				updatedPosts[oldPostIndex] = post;
+				//set the post prop to be the updatedPosts list
+				this.posts = updatedPosts;
+				//emit change
+				this.postsUpdated.next([...this.posts]);
+				//redirect to root
+				this.router.navigate(['/']);
 			})
 	}
 

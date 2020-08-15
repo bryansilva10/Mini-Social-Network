@@ -24,7 +24,10 @@ export class PostListComponent implements OnInit, OnDestroy {
 	// 		content: 'This is the third post with content'
 	// 	}
 	// ]
+
+	// props
 	posts: Post[] = [];
+	isLoading = false;
 	//subscription
 	private postsSub: Subscription;
 
@@ -36,13 +39,18 @@ export class PostListComponent implements OnInit, OnDestroy {
 
 	//at time of initializing component
 	ngOnInit() {
+		//set loading sponner to true as soon as it initializes
+		this.isLoading = true;
 		//user service to retrieve posts
 		this.postService.getPosts();
 		//listen to subject of updated list
-		this.postsSub = this.postService.getPostUpdateListener().subscribe((posts: Post[]) => {
-			//set posts to updated posts from observable
-			this.posts = posts;
-		});
+		this.postsSub = this.postService.getPostUpdateListener()
+			.subscribe((posts: Post[]) => {
+				//set loading spinner to false because we already have a response
+				this.isLoading = false;
+				//set posts to updated posts from observable
+				this.posts = posts;
+			});
 	}
 
 	//method to do something on delete event
